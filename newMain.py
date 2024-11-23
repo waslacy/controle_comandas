@@ -585,15 +585,77 @@ def abrir_config():
         atualizar_codigo()
         get_config_info()
         
+        
+        
+        
+    def listar_mesas():
+        try:
+            # Carrega as mesas do arquivo JSON
+            with open("config.json", "r") as file:
+                data = json.load(file)
+            
+            # Verifica se há mesas registradas
+            mesas = data.get("mesas", {})
+            if mesas:
+                mesas_text = "\n".join([f"Mesa {mesa}" for mesa, codigo in mesas.items()])
+            else:
+                mesas_text = "Nenhuma mesa cadastrada."
+
+        except (FileNotFoundError, json.JSONDecodeError):
+            mesas_text = "Erro ao carregar o arquivo de configuração."
+
+        # Cria o popup para exibir as mesas
+        popup_mesas = CTkToplevel(app, fg_color="#4c4c4c")
+        popup_mesas.title("Lista de Mesas")
+        popup_mesas.geometry("400x500")
+
+        border_frame_popup = CTkFrame(popup_mesas, corner_radius=20, fg_color="#e7e7e7",)
+        border_frame_popup.pack(fill="both", expand=True, padx=2, pady=2, anchor="n")
+
+        rounded_frame_popup = CTkFrame(border_frame_popup, corner_radius=20, fg_color="#e7e7e7")
+        rounded_frame_popup.pack(fill="both", expand=True, anchor="nw")
+
+        # Exibe as mesas na label do popup
+        mesas_label = CTkLabel(master=rounded_frame_popup, text=mesas_text, font=("Arial Black", 30), text_color="#292b64", justify="left")
+        mesas_label.pack(anchor="nw", padx=20)
+
+        # Foca o popup
+        popup_mesas.lift()
+        popup_mesas.attributes("-topmost", True)
+        popup_mesas.focus_force()
+
+    # Função para excluir a mesa
+    def excluir_mesa(mesa):
+        try:
+            # Carrega os dados do arquivo JSON
+            with open("config.json", "r") as file:
+                data = json.load(file)
+
+            # Remove a mesa do dicionário "mesas"
+            if "mesas" in data and mesa in data["mesas"]:
+                del data["mesas"][mesa]
+
+            # Salva o arquivo JSON atualizado
+            with open("config.json", "w") as file:
+                json.dump(data, file, indent=4)
+
+            print(f"Mesa {mesa} excluída com sucesso.")
+        except Exception as e:
+            print(f"Erro ao excluir a mesa {mesa}: {e}")
 
 
     back_frame = CTkFrame(master=config_screen, fg_color="transparent")
     back_frame.pack(anchor="s", fill="x", padx=20, pady=20)
 
+    # Criando o botão "Voltar"
     back_button = CTkLabel(master=back_frame, text="Voltar", font=("Arial", 28), fg_color="#2d2f62", width=120, height=60, text_color="#ffffff")
-    back_button.pack(anchor="n") 
+    back_button.pack(side="left", padx=20, anchor="ne", expand=True)  # Centraliza o botão dentro do frame
     back_button.bind("<Button-1>", lambda e: close_config())
-    
+
+    # Criando o botão "Listar Mesas"
+    lista_mesas = CTkLabel(master=back_frame, text="Listar Mesas", font=("Arial", 28), fg_color="#2d2f62", width=200, height=60, text_color="#ffffff")
+    lista_mesas.pack(side="right", padx=20, anchor="nw", expand=True)  # Centraliza o botão dentro do frame
+    lista_mesas.bind("<Button-1>", lambda e: listar_mesas())
     
     load_config(intervalo, alerta, bip_save)
 
