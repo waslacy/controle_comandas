@@ -9,17 +9,97 @@ import json
 from datetime import datetime
 ctypes.windll.shcore.SetProcessDpiAwareness(2)
 
+
+def set_fullscreen(window):
+    # Define a janela para tela cheia e remove bordas
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    # Define o tamanho da janela para o tamanho da tela
+    window.geometry(f"{screen_width}x{screen_height}-10+0")
+    window.attributes("-fullscreen", True)
+    window.bind("<Escape>", lambda e: "break") 
+    
+def center_window(window, width, height):
+    # Obtém as dimensões da tela
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    # Calcula a posição x e y para centralizar a janela
+    x = ((screen_width - width) // 2) - 40
+    y = ((screen_height - height) // 2) - 40
+
+    # Define o tamanho e a posição da janela
+    window.geometry(f"{width}x{height}+{x}+{y}")
+
+
+# Cria a aplicação
+app = CTk(fg_color="#e7e7e7")
+app._set_appearance_mode("light")
+
+# Ajusta a janela para usar toda a resolução do monitor
+set_fullscreen(app)
+
+fonte = CTkFont(family="Futura", size=180, weight="bold")
+fonteMenor = CTkFont(family="Futura", size=100, weight="bold")
+
+def arduino_notfound(porta_arduino):
+    # Cria uma nova janela secundária (popup)
+    not_found = CTkToplevel(master=app, fg_color="#4c4c4c")
+    not_found.title("Mensagem")
+    not_found.geometry("600x300")
+
+    # Remove as bordas e a barra de título da janela
+    not_found.overrideredirect(True)
+
+    # Centraliza o popup na tela
+    screen_width = not_found.winfo_screenwidth()
+    screen_height = not_found.winfo_screenheight()
+    window_width = 600
+    window_height = 300
+
+    x_position = int((screen_width / 2) - (window_width / 2))
+    y_position = int((screen_height / 2) - (window_height / 2))
+    not_found.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+
+    
+    
+    # Frame externo para simular a borda
+    border_frame_not_found = CTkFrame(not_found, corner_radius=20, fg_color="#4c4c4c")
+    border_frame_not_found.pack(fill="both", expand=True, padx=2, pady=2)  # Adiciona preenchimento para simular a borda
+
+    # Frame interno para a cor de fundo
+    rounded_frame_not_found = CTkFrame(border_frame_not_found, corner_radius=20, fg_color="#e7e7e7")
+    rounded_frame_not_found.pack(fill="both", expand=True)
+
+    # Label dentro do popup com a mensagem
+    label = CTkLabel(master=rounded_frame_not_found, text=f"Modulo não encontrado na porta {porta_arduino}", font=("Arial", 30), text_color="#292b64")
+    label.pack(expand=True, fill="both")
+    
+    # Faz com que o popup apareça na frente e receba o foco
+    not_found.lift()
+    not_found.attributes("-topmost", True)
+    not_found.focus_force()
+
+    
+    # Fecha o popup após 1 segundo (1000 ms)
+    not_found.after(3000, lambda: (not_found.destroy(), app.quit()))
+
 porta_ard = ""
 try:
     with open("config.json", "r") as file:
         temp_data = json.load(file)
         porta_ard = temp_data["porta_arduino"]["porta"]
 except (FileNotFoundError, json.JSONDecodeError):
-    print("Arquivo de configuração não encontrado")
+    arduino_notfound()
 
 popup_open = False
 print(porta_ard)
-ser = serial.Serial(porta_ard, 9600, timeout=1)
+try:
+    ser = serial.Serial(porta_ard, 9600, timeout=1)
+except:
+    arduino_notfound(porta_ard)
+    
     
 intervalo = 0
 alerta = 0
@@ -84,41 +164,6 @@ def salvar_em_json(secao, chave, valor):
 
 
 
-
-
-
-def set_fullscreen(window):
-    # Define a janela para tela cheia e remove bordas
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-
-    # Define o tamanho da janela para o tamanho da tela
-    window.geometry(f"{screen_width}x{screen_height}-10+0")
-    window.attributes("-fullscreen", True)
-    window.bind("<Escape>", lambda e: "break") 
-    
-def center_window(window, width, height):
-    # Obtém as dimensões da tela
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-
-    # Calcula a posição x e y para centralizar a janela
-    x = ((screen_width - width) // 2) - 40
-    y = ((screen_height - height) // 2) - 40
-
-    # Define o tamanho e a posição da janela
-    window.geometry(f"{width}x{height}+{x}+{y}")
-
-
-# Cria a aplicação
-app = CTk(fg_color="#e7e7e7")
-app._set_appearance_mode("light")
-
-# Ajusta a janela para usar toda a resolução do monitor
-set_fullscreen(app)
-
-fonte = CTkFont(family="Futura", size=180, weight="bold")
-fonteMenor = CTkFont(family="Futura", size=100, weight="bold")
 
 
 
