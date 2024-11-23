@@ -36,7 +36,6 @@ def center_window(window, width, height):
 # Cria a aplicação
 app = CTk(fg_color="#e7e7e7")
 app._set_appearance_mode("light")
-
 # Ajusta a janela para usar toda a resolução do monitor
 set_fullscreen(app)
 
