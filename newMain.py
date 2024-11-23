@@ -95,12 +95,7 @@ def set_fullscreen(window):
     # Define o tamanho da janela para o tamanho da tela
     window.geometry(f"{screen_width}x{screen_height}-10+0")
     window.attributes("-fullscreen", True)
-    window.bind("<Escape>", lambda e: exit_fullscreen(window))  # Permite sair do fullscreen com Esc
-
-def exit_fullscreen(window):
-    # Remove o modo tela cheia e restaura o tamanho da janela
-    window.attributes("-fullscreen", False)
-    window.state('normal')
+    window.bind("<Escape>", lambda e: "break") 
     
 def center_window(window, width, height):
     # Obtém as dimensões da tela
