@@ -575,10 +575,12 @@ def toggle_password_visibility():
 
 # POPUP SENHA
 def psswd_popup():
+    def fechar_aplicacao():
+        app.quit() 
     # Cria uma nova janela (popup)
     popup = CTkToplevel(master=app, fg_color="#e7e7e7")
     popup.title("Digite sua senha")
-    center_window(popup, 300, 130)
+    center_window(popup, 300, 180)
     
     # Traz o popup para frente e dá foco
     popup.transient(app)  # Define o popup como uma janela filha
@@ -611,6 +613,9 @@ def psswd_popup():
     global show_password_button
     show_password_button = CTkButton(master=frame_senha, text="", image=eye_open_image, width=40, fg_color="#e7e7e7", hover_color="#e7e7e7", command=toggle_password_visibility)
     show_password_button.pack(side="right")
+    
+    botao_fechar = CTkButton(master=popup, text="Encerrar", command=fechar_aplicacao, fg_color="red", text_color="white")
+    botao_fechar.pack(pady=20)
 
     # Função para verificar a senha
     def verificar_senha(event=None):
